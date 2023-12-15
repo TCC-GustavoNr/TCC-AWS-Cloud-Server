@@ -1,0 +1,83 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: passengers-counting
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-2
+  environment:
+    COUNT_EVENT_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+          Resource: "*"
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+functions:
+  getCountEvent:
+    handler: handler.countEvent
+    memorySize: 128
+    description: Count Event
+    events:
+      - http:
+          path: countEvent
+          method: get
+
+resources:
+  Resources:
+    CountEventDynamoDbTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "eventId"
+            AttributeType: "S"
+          - AttributeName: "vehicleId"
+            AttributeType: "S"
+          - AttributeName: "deviceId"
+            AttributeType: "S"
+          - AttributeName: "startedAt"
+            AttributeType: "S"
+          - AttributeName: "endedAt"
+            AttributeType: "S"
+          - AttributeName: "countEntering"
+            AttributeType: "N"
+          - AttributeName: "countLeaving"
+            AttributeType: "N"
+          - AttributeName: "latitudePos"
+            AttributeType: "N"
+          - AttributeName: "longitudePos"
+            AttributeType: "N"
+        KeySchema:
+          - AttributeName: "eventId"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.COUNT_EVENT_TABLE}
+	
+plugins:
+  - serverless-offline
