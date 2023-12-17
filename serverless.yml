@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: passengers-counting
+service: passenger-counting-service-v3
 frameworkVersion: "3"
 
 provider:
@@ -31,20 +31,27 @@ provider:
             - dynamodb:GetItem
             - dynamodb:PutItem
           Resource: "*"
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+        - Effect: Allow
+          Action:
+            - iot:*
+          Resource: "*"
 
 functions:
   getCountEvent:
-    handler: handler.countEvent
+    handler: src/handlers/getCountEvent.handler
     memorySize: 128
-    description: Count Event
+    description: Get Count Event
     events:
       - http:
           path: countEvent
           method: get
+  receiveCountEvent:
+    handler: src/handlers/receiveCountEvent.handler
+    memorySize: 128
+    description: Receive Count Event
+    events:
+      - iot:
+          sql: "SELECT *, topic(3) as clientId FROM 'counting-device/count-event/+'"
 
 resources:
   Resources:
@@ -57,23 +64,11 @@ resources:
             AttributeType: "S"
           - AttributeName: "vehicleId"
             AttributeType: "S"
-          - AttributeName: "deviceId"
-            AttributeType: "S"
-          - AttributeName: "startedAt"
-            AttributeType: "S"
-          - AttributeName: "endedAt"
-            AttributeType: "S"
-          - AttributeName: "countEntering"
-            AttributeType: "N"
-          - AttributeName: "countLeaving"
-            AttributeType: "N"
-          - AttributeName: "latitudePos"
-            AttributeType: "N"
-          - AttributeName: "longitudePos"
-            AttributeType: "N"
         KeySchema:
-          - AttributeName: "eventId"
+          - AttributeName: "vehicleId"
             KeyType: "HASH"
+          - AttributeName: "eventId"
+            KeyType: "RANGE"
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

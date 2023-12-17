@@ -1,0 +1,23 @@
+{
+    "name": "passenger-counting-service",
+    "version": "1.0.0",
+    "description": "",
+    "main": "handler.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "deploy": "serverless deploy",
+        "dev": "serverless offline"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@aws-sdk/util-dynamodb": "^3.474.0",
+        "ajv": "^8.12.0",
+        "ajv-formats": "^2.1.1",
+        "aws-sdk": "^2.1501.0",
+        "uuid": "^9.0.1"
+    },
+    "devDependencies": {
+        "serverless-offline": "^13.3.2"
+    }
+}
