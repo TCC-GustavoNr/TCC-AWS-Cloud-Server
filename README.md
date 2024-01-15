@@ -1,5 +1,9 @@
 # TCC-AWS-Cloud-Server
 
+<p align="center">
+  <img src="app_flow.png" />
+</p>
+
 ## Recuperando Eventos
 
 **Endpoint:** https://1bglrkm19a.execute-api.us-east-2.amazonaws.com/dev/countEvent
